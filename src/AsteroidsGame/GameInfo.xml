@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gameDificulty>
+  <easy category="easy">
+    <lives>5</lives>
+    <velocity>1</velocity>
+    <enemies>5</enemies>
+    <plusenemies>1</plusenemies>
+  </easy>
+  <normal category="normal">
+    <lives>3</lives>
+    <velocity>2</velocity>
+    <enemies>10</enemies>
+    <plusenemies>2</plusenemies>
+  </normal>
+  <hard category="hard">
+    <lives>1</lives>
+    <velocity>3</velocity>
+    <enemies>15</enemies>
+    <plusenemies>3</plusenemies>
+  </hard>
+</gameDificulty>
