@@ -63,7 +63,7 @@ bool playAgain = false;
 Uint32 invulnerable(Uint32 interval, void* param)
 {
 	//Print callback message
-	printf("Callback called back with message: %s\n", (char*)param);
+	//printf("Callback called back with message: %s\n", (char*)param);
 	invul = false;
 	return 0;
 }
@@ -351,6 +351,8 @@ void play() {
 	Uint64 LAST = 0;
 	double deltaTime = 0;
 
+	
+
 	while (iLives > 0)
 	{
 		textureText = "score:" + to_string(score);
@@ -505,7 +507,7 @@ void play() {
 						cors.pop_back();
 						iLives--;
 						invul = true;
-						SDL_TimerID timerID = SDL_AddTimer(1.5 * 1000, invulnerable, "3 seconds waited!");
+						SDL_TimerID timerID = SDL_AddTimer(1.5 * 1000, invulnerable, "1.5 seconds waited!");
 
 					}
 				}				
@@ -528,7 +530,7 @@ void play() {
 				}
 			}
 		}
-		if (!nomAs.empty()) {
+		if (!nomAs.empty() && !invul) {
 			for (int h = 0; h < nomAs.size(); h++) {
 				//srand(time(NULL));
 				//SDL_Rect target = { (rand() % WIDTH),(rand() % HEIGHT),0,0 };
@@ -541,7 +543,8 @@ void play() {
 					//cout << "xoc";
 					cors.pop_back();
 					iLives--;
-
+					invul = true;
+					SDL_TimerID timerID = SDL_AddTimer(1.5 * 1000, invulnerable, "1.5 seconds waited!");
 
 
 				}
@@ -569,7 +572,7 @@ void play() {
 			}
 
 		}
-		if (!smlAs.empty()) {
+		if (!smlAs.empty() && !invul) {
 			for (int h = 0; h < smlAs.size(); h++) {
 				//srand(time(NULL));
 				//SDL_Rect target = { (rand() % WIDTH),(rand() % HEIGHT),0,0 };
@@ -582,7 +585,8 @@ void play() {
 					//cout << "xoc";
 					cors.pop_back();
 					iLives--;
-
+					invul = true;
+					SDL_TimerID timerID = SDL_AddTimer(1.5 * 1000, invulnerable, "1.5 seconds waited!");
 
 
 				}
@@ -668,6 +672,7 @@ void play() {
 			lvlpas = true;
 		}
 		if (lvlpas) {
+			bullets.clear();
 			lvl++;
 			iEnemies += iPlus*lvl;
 			SDL_DestroyTexture(bgTexture2);
@@ -693,7 +698,9 @@ void play() {
 	if (!nomAs.empty()) {
 		nomAs.clear();
 	}
-
+	if (!bullets.empty()) {
+		bullets.clear();
+	}
 	SDL_DestroyTexture(bgTexture2);
 	SDL_DestroyTexture(ship);
 	SDL_DestroyTexture(bullet);
