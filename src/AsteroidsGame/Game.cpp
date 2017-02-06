@@ -74,6 +74,340 @@ bool compFirst(const PlayerData &a, const PlayerData &b) {
 	return a.score > b.score;
 }
 void die() {
+
+
+	list<PlayerData> rankingEasy;
+	string textureText[10];
+	std::ifstream easy("Ranking.bin", std::ios::binary);
+	if (easy.good()) {
+		PlayerData playerData[10];
+		for (int i = 0; i < 10; i++) {
+			int aux = easy.tellg();
+			if (i != 0) aux += 1;
+			easy.seekg(aux);
+			std::getline(easy, playerData[i].name, '\0'); // Get player name (only if null ternimated in binary)
+			easy.read(reinterpret_cast<char*>(&playerData[i].score), sizeof(playerData[i].score)); // Read int bytes
+			if (playerData[i].name == "") playerData[i].score = 0;
+			else {
+				rankingEasy.emplace_front(playerData[i]);
+			}
+		}
+		easy.close();
+	}
+	list<PlayerData> rankingMedium;
+	string textureTextMedium[10];
+	std::ifstream medium("RankingMedium.bin", std::ios::binary);
+	if (medium.good()) {
+		PlayerData playerData[10];
+		for (int i = 0; i < 10; i++) {
+			int aux = medium.tellg();
+			if (i != 0) aux += 1;
+			medium.seekg(aux);
+			std::getline(medium, playerData[i].name, '\0'); // Get player name (only if null ternimated in binary)
+			medium.read(reinterpret_cast<char*>(&playerData[i].score), sizeof(playerData[i].score)); // Read int bytes
+			if (playerData[i].name == "") playerData[i].score = 0;
+			else {
+				rankingMedium.emplace_front(playerData[i]);
+			}
+		}
+		medium.close();
+	}
+	list<PlayerData> rankingHard;
+	string textureTextHard[10];
+	std::ifstream hard("RankingHard.bin", std::ios::binary);
+	if (hard.good()) {
+		PlayerData playerData[10];
+		for (int i = 0; i < 10; i++) {
+			int aux = hard.tellg();
+			if (i != 0) aux += 1;
+			hard.seekg(aux);
+			std::getline(hard, playerData[i].name, '\0'); // Get player name (only if null ternimated in binary)
+			hard.read(reinterpret_cast<char*>(&playerData[i].score), sizeof(playerData[i].score)); // Read int bytes
+			if (playerData[i].name == "") playerData[i].score = 0;
+			else {
+				rankingHard.emplace_front(playerData[i]);
+			}
+		}
+		hard.close();
+	}
+	cout << "Enter Your Name" << endl;
+	string name;
+	cin >> name;
+
+	if (name.length() > 8) {
+		cout << "Name too long, Max. 8 characters. Enter Your Name Again" << endl;
+		cin >> name;
+	}
+
+	if (iPlus == 1) {
+		PlayerData playerData = { name, score };
+
+		rankingEasy.emplace_front(playerData);
+
+		rankingEasy.sort(compFirst);
+
+		std::ofstream savefile("Ranking.bin", std::ios::binary);
+		int i = 0;
+		if (savefile.good()) {
+			for (list<PlayerData>::iterator it = rankingEasy.begin(); it != rankingEasy.end(); ++it)
+			{
+				if (it->name != "" && score > 0 && i <= 10) {
+					savefile.write(it->name.c_str(), it->name.size()); // Write string to binary file
+					savefile.write("\0", sizeof(char));
+					savefile.write(reinterpret_cast<char*>(&it->score), sizeof(it->score));
+					savefile.write("\0", sizeof(char));// Write int to binary file
+				}
+				i++;
+			}
+			savefile.close();
+		}
+
+	}
+	if (iPlus == 2) {
+		PlayerData playerData = { name, score };
+
+		rankingMedium.emplace_front(playerData);
+
+		rankingMedium.sort(compFirst);
+
+		std::ofstream savefile("RankingMedium.bin", std::ios::binary);
+		int i = 0;
+		if (savefile.good()) {
+			for (list<PlayerData>::iterator it = rankingMedium.begin(); it != rankingMedium.end(); ++it)
+			{
+				if (it->name != "" && score > 0 && i <= 10) {
+					savefile.write(it->name.c_str(), it->name.size()); // Write string to binary file
+					savefile.write("\0", sizeof(char));
+					savefile.write(reinterpret_cast<char*>(&it->score), sizeof(it->score));
+					savefile.write("\0", sizeof(char));// Write int to binary file
+				}
+				i++;
+			}
+			savefile.close();
+		}
+	}
+	if (iPlus == 3) {
+		PlayerData playerData = { name, score };
+
+		rankingHard.emplace_front(playerData);
+
+		rankingHard.sort(compFirst);
+
+		int i = 0;
+		std::ofstream savefile("RankingHard.bin", std::ios::binary);
+		if (savefile.good()) {
+			for (list<PlayerData>::iterator it = rankingHard.begin(); it != rankingHard.end(); ++it)
+			{
+				if (it->name != "" && score > 0 && i <= 10) {
+					savefile.write(it->name.c_str(), it->name.size()); // Write string to binary file
+					savefile.write("\0", sizeof(char));
+					savefile.write(reinterpret_cast<char*>(&it->score), sizeof(it->score));
+					savefile.write("\0", sizeof(char));// Write int to binary file
+				}
+				i++;
+			}
+			savefile.close();
+		}
+
+	}
+
+	SDL_Window* gameOver = SDL_CreateWindow("GameOver", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+	SDL_Renderer* renderer3 = SDL_CreateRenderer(gameOver, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	SDL_Color color = { 255,255,255 };
+	TTF_Font* gFont = TTF_OpenFont("../../res/fnt/Hyperspace.otf", 20);
+	SDL_Surface* textSurface[10];
+	SDL_Surface* textSurfaceMedium[10];
+	SDL_Surface* textSurfaceHard[10];
+	SDL_Texture* mTexture[10];
+	SDL_Texture* mTextureMedium[10];
+	SDL_Texture* mTextureHard[10];
+	SDL_Rect textRect[10];
+	SDL_Rect textRectMedium[10];
+	SDL_Rect textRectHard[10];
+
+	int j = 0;
+
+	for (list<PlayerData>::iterator it = rankingEasy.begin(); it != rankingEasy.end(); ++it)
+	{
+		if (j < 10) {
+
+			textureText[j] = to_string(j + 1) + "  " + it->name.c_str() + "  " + to_string(it->score);
+			textSurface[j] = TTF_RenderText_Solid(gFont, textureText[j].c_str(), color);
+			mTexture[j] = SDL_CreateTextureFromSurface(renderer3, textSurface[j]);
+			if (j == 0)
+				textRect[j] = { 35,WIDTH / 2 - 75, textSurface[j]->w,textSurface[j]->h };
+			else {
+				textRect[j] = { 35  ,textRect[j - 1].y + textSurface[j]->h, textSurface[j]->w,textSurface[j]->h };
+			}
+		}
+		j++;
+	}
+
+	for (int i = 0; i < 10; i++) {
+		if (textureText[i] == "") {
+			textureText[i] = to_string(i + 1) + "  " + "      " + "  " + to_string(0);
+			textSurface[i] = TTF_RenderText_Solid(gFont, textureText[i].c_str(), color);
+			mTexture[i] = SDL_CreateTextureFromSurface(renderer3, textSurface[i]);
+			if (i == 0)
+				textRect[i] = { 35,WIDTH / 2 - 75, textSurface[i]->w,textSurface[i]->h };
+			else {
+				textRect[i] = { 35  ,textRect[i - 1].y + textSurface[i]->h, textSurface[i]->w,textSurface[i]->h };
+			}
+		}
+	}
+	rankingEasy.clear();
+
+	int l = 0;
+
+	for (list<PlayerData>::iterator it = rankingMedium.begin(); it != rankingMedium.end(); ++it)
+	{
+		if (l < 10) {
+
+			textureTextMedium[l] = to_string(l + 1) + "  " + it->name.c_str() + "  " + to_string(it->score);
+			textSurfaceMedium[l] = TTF_RenderText_Solid(gFont, textureTextMedium[l].c_str(), color);
+			mTextureMedium[l] = SDL_CreateTextureFromSurface(renderer3, textSurfaceMedium[l]);
+			if (l == 0)
+				textRectMedium[l] = { 275,WIDTH / 2 - 75, textSurfaceMedium[l]->w,textSurfaceMedium[l]->h };
+			else {
+				textRectMedium[l] = { 275 ,textRectMedium[l - 1].y + textSurfaceMedium[l]->h, textSurfaceMedium[l]->w,textSurfaceMedium[l]->h };
+			}
+		}
+		l++;
+	}
+
+	for (int i = 0; i < 10; i++) {
+		if (textureTextMedium[i] == "") {
+			textureTextMedium[i] = to_string(i + 1) + "  " + "      " + "  " + to_string(0);
+			textSurfaceMedium[i] = TTF_RenderText_Solid(gFont, textureTextMedium[i].c_str(), color);
+			mTextureMedium[i] = SDL_CreateTextureFromSurface(renderer3, textSurfaceMedium[i]);
+			if (i == 0)
+				textRectMedium[i] = { 275,WIDTH / 2 - 75, textSurfaceMedium[i]->w,textSurfaceMedium[i]->h };
+			else {
+				textRectMedium[i] = { 275  ,textRectMedium[i - 1].y + textSurfaceMedium[i]->h, textSurfaceMedium[i]->w,textSurfaceMedium[i]->h };
+			}
+		}
+	}
+	rankingMedium.clear();
+
+	int k = 0;
+
+	for (list<PlayerData>::iterator it = rankingHard.begin(); it != rankingHard.end(); ++it)
+	{
+		if (k < 10) {
+
+			textureTextHard[k] = to_string(k + 1) + "  " + it->name.c_str() + "  " + to_string(it->score);
+			textSurfaceHard[k] = TTF_RenderText_Solid(gFont, textureTextHard[k].c_str(), color);
+			mTextureHard[k] = SDL_CreateTextureFromSurface(renderer3, textSurfaceHard[k]);
+			if (k == 0)
+				textRectHard[k] = { 515,WIDTH / 2 - 75, textSurfaceHard[k]->w,textSurfaceHard[k]->h };
+			else {
+				textRectHard[k] = { 515  ,textRectHard[k - 1].y + textSurfaceHard[k]->h, textSurfaceHard[k]->w,textSurfaceHard[k]->h };
+			}
+		}
+		k++;
+	}
+
+	for (int i = 0; i < 10; i++) {
+		if (textureTextHard[i] == "") {
+			textureTextHard[i] = to_string(i + 1) + "  " + "      " + "  " + to_string(0);
+			textSurfaceHard[i] = TTF_RenderText_Solid(gFont, textureTextHard[i].c_str(), color);
+			mTextureHard[i] = SDL_CreateTextureFromSurface(renderer3, textSurfaceHard[i]);
+			if (i == 0)
+				textRectHard[i] = { 515,WIDTH / 2 - 75, textSurfaceHard[i]->w,textSurfaceHard[i]->h };
+			else {
+				textRectHard[i] = { 515  ,textRectHard[i - 1].y + textSurfaceHard[i]->h, textSurfaceHard[i]->w,textSurfaceHard[i]->h };
+			}
+		}
+	}
+	rankingHard.clear();
+
+
+	SDL_Surface* rankingSurface = TTF_RenderText_Solid(gFont, "RANKING EASY", color);
+	SDL_Texture* rankingTexture = SDL_CreateTextureFromSurface(renderer3, rankingSurface);
+	SDL_Rect rankingRect = { 40,WIDTH / 2 - 100,rankingSurface->w,rankingSurface->h };
+
+	SDL_Surface* rankingMedSurface = TTF_RenderText_Solid(gFont, "RANKING MEDIUM", color);
+	SDL_Texture* rankingMedTexture = SDL_CreateTextureFromSurface(renderer3, rankingMedSurface);
+	SDL_Rect rankingMedRect = { 280,WIDTH / 2 - 100,rankingMedSurface->w,rankingMedSurface->h };
+
+	SDL_Surface* rankingHardSurface = TTF_RenderText_Solid(gFont, "RANKING HARD", color);
+	SDL_Texture* rankingHardTexture = SDL_CreateTextureFromSurface(renderer3, rankingHardSurface);
+	SDL_Rect rankingHardRect = { 520,WIDTH / 2 - 100,rankingHardSurface->w,rankingHardSurface->h };
+
+	SDL_Texture *bgTexture = IMG_LoadTexture(renderer3, "../../res/gfx/blacks.png");
+	SDL_Rect bgRect = { 0, 0, WIDTH, HEIGHT };
+
+	SDL_Texture *gameOverText = IMG_LoadTexture(renderer3, "../../res/gfx/gameover.png");
+	SDL_Rect gameOverRect = { (WIDTH / 2) - 200,0,400,200 };
+
+	SDL_Texture *replayText = IMG_LoadTexture(renderer3, "../../res/gfx/playagain.png");
+	SDL_Rect replayRect = { 5 , 50 , 150, 100 };
+
+	SDL_Texture *exitText = IMG_LoadTexture(renderer3, "../../res/gfx/exit.png");
+	SDL_Rect exitRect = { WIDTH - 155, 50, 150, 100 };
+
+	if (bgTexture == nullptr) {
+		cout << "error";
+	}
+	SDL_Event event;
+	while (alive)
+	{
+
+		while (SDL_PollEvent(&event)) {
+			switch (event.type)
+			{
+			case SDL_QUIT:
+				alive = !alive;
+				break;
+			case SDL_MOUSEBUTTONDOWN:
+				if (event.motion.x <= exitRect.x + exitRect.w && event.motion.x >= exitRect.x  && event.motion.y <= exitRect.y + exitRect.h && event.motion.y >= exitRect.h) {
+					alive = !alive;
+				}
+				if (event.motion.x <= replayRect.x + replayRect.w && event.motion.x >= replayRect.x  && event.motion.y <= replayRect.y + replayRect.h && event.motion.y >= replayRect.h) {
+					SDL_DestroyTexture(bgTexture);
+					SDL_DestroyTexture(gameOverText);
+					SDL_DestroyTexture(replayText);
+					SDL_DestroyTexture(exitText);
+					SDL_DestroyWindow(gameOver);
+					SDL_DestroyRenderer(renderer3);
+					playAgain = true;
+					char** maining = (char**)'a';
+					main(1, maining);
+
+				}
+
+			}
+		}
+		SDL_RenderCopy(renderer3, bgTexture, nullptr, &bgRect);
+		SDL_RenderCopy(renderer3, replayText, nullptr, &replayRect);
+		SDL_RenderCopy(renderer3, gameOverText, nullptr, &gameOverRect);
+		for (int i = 0; i < 10; i++) {
+			SDL_RenderCopy(renderer3, mTexture[i], nullptr, &textRect[i]);
+		}
+		for (int i = 0; i < 10; i++) {
+			SDL_RenderCopy(renderer3, mTextureMedium[i], nullptr, &textRectMedium[i]);
+		}
+		for (int i = 0; i < 10; i++) {
+			SDL_RenderCopy(renderer3, mTextureHard[i], nullptr, &textRectHard[i]);
+		}
+		SDL_RenderCopy(renderer3, rankingTexture, nullptr, &rankingRect);
+		SDL_RenderCopy(renderer3, rankingMedTexture, nullptr, &rankingMedRect);
+		SDL_RenderCopy(renderer3, rankingHardTexture, nullptr, &rankingHardRect);
+		SDL_RenderCopy(renderer3, exitText, nullptr, &exitRect);
+		SDL_RenderPresent(renderer3);
+	}
+
+}
+
+
+
+
+
+
+
+
+
+/*
 	if (iPlus == 1) {
 		TTF_Init();
 		cout << "Enter Your Name" << endl;
@@ -105,11 +439,11 @@ void die() {
 		ranking.emplace_front(playerData);
 
 		ranking.sort(compFirst);
-		cout << "sorted List" << endl;
+		/cout << "sorted List" << endl;
 		for (list<PlayerData>::iterator it = ranking.begin(); it != ranking.end(); ++it)
 		{
 			if (it->score > 0) {
-				cout << it->name << ":" << it->score << endl;
+				//cout << it->name << ":" << it->score << endl;
 			}
 		}
 		std::ofstream savefile("Ranking.bin", std::ios::binary);
@@ -262,11 +596,11 @@ void die() {
 		ranking.emplace_front(playerData);
 
 		ranking.sort(compFirst);
-		cout << "sorted List" << endl;
+	/cout << "sorted List" << endl;
 		for (list<PlayerData>::iterator it = ranking.begin(); it != ranking.end(); ++it)
 		{
 			if (it->score > 0) {
-				cout << it->name << ":" << it->score << endl;
+				//cout << it->name << ":" << it->score << endl;
 			}
 		}
 		std::ofstream savefile("RankingMedium.bin", std::ios::binary);
@@ -420,7 +754,7 @@ void die() {
 		ranking.emplace_front(playerData);
 
 		ranking.sort(compFirst);
-		cout << "sorted List" << endl;
+		/*cout << "sorted List" << endl;
 		for (list<PlayerData>::iterator it = ranking.begin(); it != ranking.end(); ++it)
 		{
 			if (it->score > 0) {
@@ -548,6 +882,7 @@ void die() {
 	}
 
 }
+*/
 void play() {
 	
 	TTF_Init();
@@ -820,7 +1155,9 @@ void play() {
 						//The sprites appear to overlap.
 						shipRect.x = WIDTH / 2 - shipRect.w;
 						shipRect.y = HEIGHT / 2 - shipRect.h;
-						cors.pop_back();
+						if (!cors.empty()) {
+							cors.pop_back();
+						}
 						iLives--;
 						invul = true;
 						SDL_TimerID timerID = SDL_AddTimer(1.5 * 1000, invulnerable, "1.5 seconds waited!");
@@ -865,7 +1202,9 @@ void play() {
 						//The sprites appear to overlap.
 						shipRect.x = WIDTH / 2 - shipRect.w;
 						shipRect.y = HEIGHT / 2 - shipRect.h;
-						cors.pop_back();
+						if (!cors.empty()) {
+							cors.pop_back();
+						}
 						iLives--;
 						invul = true;
 						SDL_TimerID timerID = SDL_AddTimer(1.5 * 1000, invulnerable, "1.5 seconds waited!");
@@ -909,7 +1248,9 @@ void play() {
 					shipRect.x = WIDTH / 2 - shipRect.w;
 					shipRect.y = HEIGHT / 2 - shipRect.h;
 					//cout << "xoc";
-					cors.pop_back();
+					if (!cors.empty()) {
+						cors.pop_back();
+					}
 					iLives--;
 					invul = true;
 					SDL_TimerID timerID = SDL_AddTimer(1.5 * 1000, invulnerable, "1.5 seconds waited!");
