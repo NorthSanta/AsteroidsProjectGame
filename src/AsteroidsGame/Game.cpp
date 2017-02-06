@@ -38,7 +38,7 @@ vector<SDL_Rect> bullets;
 vector<SDL_Rect> cors;
 
 
-
+bool invul = false;
 
 int iLives;
 float iSpeed;
@@ -58,7 +58,15 @@ struct PlayerData
 	int score;
 };
 
+bool playAgain = false;
 
+Uint32 invulnerable(Uint32 interval, void* param)
+{
+	//Print callback message
+	printf("Callback called back with message: %s\n", (char*)param);
+	invul = false;
+	return 0;
+}
 
 
 
@@ -204,8 +212,10 @@ void die() {
 					SDL_DestroyTexture(exitText);
 					SDL_DestroyWindow(gameOver);
 					SDL_DestroyRenderer(renderer3);
+					playAgain = true;
 					char** maining = (char**)'a';
 					main(1, maining);
+					
 				}
 
 			}
@@ -223,13 +233,11 @@ void die() {
 
 }
 void play() {
-	score = 0;
+	
 	TTF_Init();
 	//cout << "counter: " << counter << endl;
-	if (counter = 1) {
-		iSpeed = iSpeed / 100;
-		counter++;
-	}
+	
+	
 	//cout << "counter: " << counter << endl;
 	srand(time(NULL));
 	SDL_Window* game = SDL_CreateWindow("Asteroids", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
@@ -258,18 +266,42 @@ void play() {
 	//variable to control fps
 	UINT32 start;
 	UINT32 delta;
-	//lives number & position
-	for (int i = 0; i < iLives; i++) {
-		cors.push_back(cor);
-		//cout << "push";
+
+	if (counter == 0) {
+		iSpeed = iSpeed / 100;
+		score = 0;
+		for (int i = 0; i < iLives; i++) {
+			cors.push_back(cor);
+			//cout << "push";
+		}
+		for (int i = 0; i < iLives; i++) {
+			if (i == 0) {
+				cors[i].x = cors[0].x;
+			}
+			else {
+				cors[i].x = cors[i - 1].x - 50;
+			}
+		}
+		counter++;
 	}
-	for (int i = 0; i < iLives; i++) {
-		if (i == 0) {
-			cors[i].x = cors[0].x;
+
+	//lives number & position
+	else if (playAgain == true) {
+		iSpeed = iSpeed / 100;
+		score = 0;
+		for (int i = 0; i < iLives; i++) {
+			cors.push_back(cor);
+			//cout << "push";
 		}
-		else {
-			cors[i].x = cors[i - 1].x - 50;
+		for (int i = 0; i < iLives; i++) {
+			if (i == 0) {
+				cors[i].x = cors[0].x;
+			}
+			else {
+				cors[i].x = cors[i - 1].x - 50;
+			}
 		}
+		playAgain = false;
 	}
 	//enemy number
 	for (int i = 0; i < iEnemies; i++) {
@@ -314,6 +346,11 @@ void play() {
 	int shipY = 0;
 	SDL_Event event2;
 	bool lvlpas = false;
+
+	Uint64 NOW = SDL_GetTicks();
+	Uint64 LAST = 0;
+	double deltaTime = 0;
+
 	while (iLives > 0)
 	{
 		textureText = "score:" + to_string(score);
@@ -384,10 +421,12 @@ void play() {
 
 
 		//getdelta time
-		uint32_t tick_time = SDL_GetTicks();
-		delta = tick_time - start;
-		start = tick_time;
+	
+		
+		
+		
 
+		
 		//MOUSE angle math
 		int deltax = (shipRect.x) - x;
 		int deltay = (shipRect.y) - y;
@@ -451,25 +490,30 @@ void play() {
 			}
 		}
 		//ship collision
-		if (!bigAs.empty()) {
+		if (!bigAs.empty() && !invul) {
 			for (int h = 0; h < bigAs.size(); h++) {
 				//srand(time(NULL));
 				//SDL_Rect target = { (rand() % WIDTH),(rand() % HEIGHT),0,0 };
+				if ((shipRect.x >= bigAs[h].x && shipRect.x <= (bigAs[h].x + bigAs[h].w)) ||
+					((shipRect.x + shipRect.w) >= bigAs[h].x && (shipRect.x + shipRect.w) <= (bigAs[h].x + bigAs[h].w))) {
+					//Now we look at the y axis:
+					if ((shipRect.y >= bigAs[h].y && shipRect.y <= (bigAs[h].y + bigAs[h].h)) ||
+						((shipRect.y + shipRect.h) >= bigAs[h].y && (shipRect.y + shipRect.h) <= (bigAs[h].y + bigAs[h].h))) {
+						//The sprites appear to overlap.
+						shipRect.x = WIDTH / 2 - shipRect.w;
+						shipRect.y = HEIGHT / 2 - shipRect.h;
+						cors.pop_back();
+						iLives--;
+						invul = true;
+						SDL_TimerID timerID = SDL_AddTimer(1.5 * 1000, invulnerable, "3 seconds waited!");
 
-				if (((shipRect.x - bigAs[h].x) + (shipRect.y - bigAs[h].y)) * ((shipRect.x - bigAs[h].x) + (shipRect.y - bigAs[h].y)) < 0.5*0.5) {
-					//cout << "xocBO";
-					shipRect.x = WIDTH / 2 - shipRect.w;
-					shipRect.y = HEIGHT / 2 - shipRect.h;
-					cors.pop_back();
-					iLives--;
-				}
-
-
-
-				//bullet collision
-				for (int g = 0; g < bullets.size(); g++) {
-					
+					}
+				}				
+					//bullet collision
+					for (int g = 0; g < bullets.size(); g++) {
+						if (!bigAs.empty() && bigAs.size() != 0 && h <  bigAs.size()) {
 						if (bullets[g].x >= bigAs[h].x && bullets[g].x <= bigAs[h].x + bigAs[h].w && bullets[g].y >= bigAs[h].y && bullets[g].y <= bigAs[h].y + bigAs[h].h) {
+
 							score += 20;
 							iSpeed += score / 10000000;
 							bullets.erase(bullets.begin() + g);
@@ -480,10 +524,7 @@ void play() {
 							bigAs.erase(bigAs.begin() + h);
 
 						}
-					
-
-
-
+					}
 				}
 			}
 		}
@@ -505,24 +546,25 @@ void play() {
 
 				}
 
+				
+					//bullet collision
+					for (int g = 0; g < bullets.size(); g++) {
+						if (!nomAs.empty() && nomAs.size() != 0 && h < nomAs.size()) {
+						if (bullets[g].x >= nomAs[h].x && bullets[g].x <= nomAs[h].x + nomAs[h].w && bullets[g].y >= nomAs[h].y && bullets[g].y <= nomAs[h].y + nomAs[h].h) {
+							score += 50;
+							iSpeed += score / 10000000;
+							bullets.erase(bullets.begin() + g);
+							smlARect.x = nomAs[h].x;
+							smlARect.y = nomAs[h].y;
+							smlAs.push_back(smlARect);
+							smlAs.push_back(smlARect);
+							nomAs.erase(nomAs.begin() + h);
 
-				//bullet collision
-				for (int g = 0; g < bullets.size(); g++) {
+						}
 
-					if (bullets[g].x >= nomAs[h].x && bullets[g].x <= nomAs[h].x + nomAs[h].w && bullets[g].y >= nomAs[h].y && bullets[g].y <= nomAs[h].y + nomAs[h].h) {
-						score += 50;
-						iSpeed += score / 10000000;
-						bullets.erase(bullets.begin() + g);
-						smlARect.x = nomAs[h].x;
-						smlARect.y = nomAs[h].y;
-						smlAs.push_back(smlARect);
-						smlAs.push_back(smlARect);
-						nomAs.erase(nomAs.begin() + h);
+
 
 					}
-
-
-
 				}
 			}
 
@@ -545,20 +587,18 @@ void play() {
 
 				}
 
+				
+					//bullet collision
+					for (int g = 0; g < bullets.size(); g++) {
+						if (!smlAs.empty() && smlAs.size() != 0 && h < smlAs.size()) {
+						if (bullets[g].x >= smlAs[h].x && bullets[g].x <= smlAs[h].x + smlAs[h].w && bullets[g].y >= smlAs[h].y && bullets[g].y <= smlAs[h].y + smlAs[h].h) {
+							score += 100;
+							iSpeed += score / 10000000;
+							bullets.erase(bullets.begin() + g);
+							smlAs.erase(smlAs.begin() + h);
 
-				//bullet collision
-				for (int g = 0; g < bullets.size(); g++) {
-
-					if (bullets[g].x >= smlAs[h].x && bullets[g].x <= smlAs[h].x + smlAs[h].w && bullets[g].y >= smlAs[h].y && bullets[g].y <= smlAs[h].y + smlAs[h].h) {
-						score += 100;
-						iSpeed += score / 10000000;
-						bullets.erase(bullets.begin() + g);
-						smlAs.erase(smlAs.begin() + h);
-
+						}
 					}
-
-
-
 				}
 			}
 
@@ -610,7 +650,14 @@ void play() {
 		}
 		//SDL_RenderCopy(renderer2, bullet, nullptr, &bulletRect);
 		//rotate ship on mouse
-		SDL_RenderCopyEx(renderer2, ship, NULL, &shipRect, angle_deg, NULL, SDL_FLIP_NONE);
+		if (invul) {
+			if (SDL_GetTicks() % 500 > 250) {
+				SDL_RenderCopyEx(renderer2, ship, NULL, &shipRect, angle_deg, NULL, SDL_FLIP_NONE);
+			}
+		}
+		else {
+			SDL_RenderCopyEx(renderer2, ship, NULL, &shipRect, angle_deg, NULL, SDL_FLIP_NONE);
+		}
 		SDL_RenderCopy(renderer2, mTexture, nullptr, &textRect);
 		SDL_RenderPresent(renderer2);
 		//regulate FPS
