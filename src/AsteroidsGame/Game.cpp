@@ -74,93 +74,93 @@ bool compFirst(const PlayerData &a, const PlayerData &b) {
 	return a.score > b.score;
 }
 void die() {
-	
-	TTF_Init();
-	cout << "Enter Your Name" << endl;
-	string name;
-	cin >> name;
-	//read & update ranking
-	list<PlayerData> ranking;
-	string textureText[10];
-	std::ifstream loadfile("Ranking.bin", std::ios::binary);
-	if (loadfile.good()) {
-		PlayerData playerData[10];
-		for (int i = 0; i < 10; i++) {
-			int aux = loadfile.tellg();
-			if (i != 0) aux += 1;
-			loadfile.seekg(aux);
-			std::getline(loadfile, playerData[i].name, '\0'); // Get player name (only if null ternimated in binary)
-			loadfile.read(reinterpret_cast<char*>(&playerData[i].score), sizeof(playerData[i].score)); // Read int bytes
-			if (playerData[i].name == "") playerData[i].score = 0;
-			else {
-				ranking.emplace_front(playerData[i]);
+	if (iPlus == 1) {
+		TTF_Init();
+		cout << "Enter Your Name" << endl;
+		string name;
+		cin >> name;
+		//read & update ranking
+		list<PlayerData> ranking;
+		string textureText[10];
+		std::ifstream loadfile("Ranking.bin", std::ios::binary);
+		if (loadfile.good()) {
+			PlayerData playerData[10];
+			for (int i = 0; i < 10; i++) {
+				int aux = loadfile.tellg();
+				if (i != 0) aux += 1;
+				loadfile.seekg(aux);
+				std::getline(loadfile, playerData[i].name, '\0'); // Get player name (only if null ternimated in binary)
+				loadfile.read(reinterpret_cast<char*>(&playerData[i].score), sizeof(playerData[i].score)); // Read int bytes
+				if (playerData[i].name == "") playerData[i].score = 0;
+				else {
+					ranking.emplace_front(playerData[i]);
+				}
 			}
+			loadfile.close();
 		}
 		loadfile.close();
-	}
-	loadfile.close();
-	//acctualizar lista
-	PlayerData playerData = { name, score };
-	
-	ranking.emplace_front(playerData);
-	
-	ranking.sort(compFirst);
-	cout << "sorted List" << endl;
-	for (list<PlayerData>::iterator it = ranking.begin(); it != ranking.end(); ++it)
-	{
-		if (it->score > 0) {
-			cout << it->name << ":" << it->score << endl;
-		}
-	}
-	std::ofstream savefile("Ranking.bin", std::ios::binary);
-	int i = 0;
-	if (savefile.good()) {
+		//acctualizar lista
+		PlayerData playerData = { name, score };
+
+		ranking.emplace_front(playerData);
+
+		ranking.sort(compFirst);
+		cout << "sorted List" << endl;
 		for (list<PlayerData>::iterator it = ranking.begin(); it != ranking.end(); ++it)
-		{	
-			if (it->name != "" && score > 0 && i <= 10) {
-				savefile.write(it->name.c_str(), it->name.size()); // Write string to binary file
-				savefile.write("\0", sizeof(char));
-				savefile.write(reinterpret_cast<char*>(&it->score), sizeof(it->score));
-				savefile.write("\0", sizeof(char));// Write int to binary file
+		{
+			if (it->score > 0) {
+				cout << it->name << ":" << it->score << endl;
 			}
-			i++;
 		}
-		savefile.close();
-	}
-	
-	
-	SDL_Window* gameOver = SDL_CreateWindow("GameOver", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
-	SDL_Renderer* renderer3 = SDL_CreateRenderer(gameOver, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	SDL_Color color = { 255,255,255 };
-	TTF_Font* gFont = TTF_OpenFont("../../res/fnt/Hyperspace.otf", 20);
-	SDL_Surface* textSurface[10];
-	SDL_Texture* mTexture[10];
-	SDL_Rect textRect[10];
-	int j = 0;
-	
+		std::ofstream savefile("Ranking.bin", std::ios::binary);
+		int i = 0;
+		if (savefile.good()) {
+			for (list<PlayerData>::iterator it = ranking.begin(); it != ranking.end(); ++it)
+			{
+				if (it->name != "" && score > 0 && i <= 10) {
+					savefile.write(it->name.c_str(), it->name.size()); // Write string to binary file
+					savefile.write("\0", sizeof(char));
+					savefile.write(reinterpret_cast<char*>(&it->score), sizeof(it->score));
+					savefile.write("\0", sizeof(char));// Write int to binary file
+				}
+				i++;
+			}
+			savefile.close();
+		}
+
+
+		SDL_Window* gameOver = SDL_CreateWindow("GameOver", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+		SDL_Renderer* renderer3 = SDL_CreateRenderer(gameOver, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+		SDL_Color color = { 255,255,255 };
+		TTF_Font* gFont = TTF_OpenFont("../../res/fnt/Hyperspace.otf", 20);
+		SDL_Surface* textSurface[10];
+		SDL_Texture* mTexture[10];
+		SDL_Rect textRect[10];
+		int j = 0;
+
 		for (list<PlayerData>::iterator it = ranking.begin(); it != ranking.end(); ++it)
 		{
 			if (j < 10) {
-				
-				textureText[j] = to_string(j+1) + "  " + it->name.c_str() + "  " + to_string(it->score);
+
+				textureText[j] = to_string(j + 1) + "  " + it->name.c_str() + "  " + to_string(it->score);
 				textSurface[j] = TTF_RenderText_Solid(gFont, textureText[j].c_str(), color);
 				mTexture[j] = SDL_CreateTextureFromSurface(renderer3, textSurface[j]);
-				if(j == 0)
-				textRect[j] = { 35,WIDTH/2-75, textSurface[j]->w,textSurface[j]->h };
+				if (j == 0)
+					textRect[j] = { 35,WIDTH / 2 - 75, textSurface[j]->w,textSurface[j]->h };
 				else {
 					textRect[j] = { 35  ,textRect[j - 1].y + textSurface[j]->h, textSurface[j]->w,textSurface[j]->h };
 				}
 			}
 			j++;
 		}
-		
+
 		for (int i = 0; i < 10; i++) {
 			if (textureText[i] == "") {
 				textureText[i] = to_string(i + 1) + "  " + "      " + "  " + to_string(0);
 				textSurface[i] = TTF_RenderText_Solid(gFont, textureText[i].c_str(), color);
 				mTexture[i] = SDL_CreateTextureFromSurface(renderer3, textSurface[i]);
 				if (i == 0)
-					textRect[i] = { 35,WIDTH/2-75, textSurface[i]->w,textSurface[i]->h };
+					textRect[i] = { 35,WIDTH / 2 - 75, textSurface[i]->w,textSurface[i]->h };
 				else {
 					textRect[i] = { 35  ,textRect[i - 1].y + textSurface[i]->h, textSurface[i]->w,textSurface[i]->h };
 				}
@@ -168,67 +168,383 @@ void die() {
 		}
 		ranking.clear();
 
-		
-	SDL_Surface* rankingSurface = TTF_RenderText_Solid(gFont, "RANKING", color);
-	SDL_Texture* rankingTexture = SDL_CreateTextureFromSurface(renderer3, rankingSurface);
-	SDL_Rect rankingRect = { 75,WIDTH / 2 - 100,rankingSurface->w,rankingSurface->h };
 
-	
-	
+		SDL_Surface* rankingSurface = TTF_RenderText_Solid(gFont, "RANKING EASY", color);
+		SDL_Texture* rankingTexture = SDL_CreateTextureFromSurface(renderer3, rankingSurface);
+		SDL_Rect rankingRect = { 40,WIDTH / 2 - 100,rankingSurface->w,rankingSurface->h };
 
-	SDL_Texture *bgTexture = IMG_LoadTexture(renderer3, "../../res/gfx/blacks.png");
-	SDL_Rect bgRect = { 0, 0, WIDTH, HEIGHT };
 
-	SDL_Texture *gameOverText = IMG_LoadTexture(renderer3, "../../res/gfx/gameover.png");
-	SDL_Rect gameOverRect = { (WIDTH / 2) - 200,50,400,200 };
 
-	SDL_Texture *replayText = IMG_LoadTexture(renderer3, "../../res/gfx/playagain.png");
-	SDL_Rect replayRect = { WIDTH / 2 - 75 , HEIGHT / 2 , 150, 100 };
 
-	SDL_Texture *exitText = IMG_LoadTexture(renderer3, "../../res/gfx/exit.png");
-	SDL_Rect exitRect = { WIDTH / 2 - 75 , HEIGHT / 2 + 150, 150, 100 };
+		SDL_Texture *bgTexture = IMG_LoadTexture(renderer3, "../../res/gfx/blacks.png");
+		SDL_Rect bgRect = { 0, 0, WIDTH, HEIGHT };
 
-	if (bgTexture == nullptr) {
-		cout << "error";
-	}
-	SDL_Event event;
-	while (alive)
-	{
-		
-		while (SDL_PollEvent(&event)) {
-			switch (event.type)
-			{
-			case SDL_QUIT:
-				alive = !alive;
-				break;
-			case SDL_MOUSEBUTTONDOWN:
-				if (event.motion.x <= exitRect.x + exitRect.w && event.motion.x >= exitRect.x  && event.motion.y <= exitRect.y + exitRect.h && event.motion.y >= exitRect.h) {
+		SDL_Texture *gameOverText = IMG_LoadTexture(renderer3, "../../res/gfx/gameover.png");
+		SDL_Rect gameOverRect = { (WIDTH / 2) - 200,50,400,200 };
+
+		SDL_Texture *replayText = IMG_LoadTexture(renderer3, "../../res/gfx/playagain.png");
+		SDL_Rect replayRect = { WIDTH / 2 - 75 , HEIGHT / 2 , 150, 100 };
+
+		SDL_Texture *exitText = IMG_LoadTexture(renderer3, "../../res/gfx/exit.png");
+		SDL_Rect exitRect = { WIDTH / 2 - 75 , HEIGHT / 2 + 150, 150, 100 };
+
+		if (bgTexture == nullptr) {
+			cout << "error";
+		}
+		SDL_Event event;
+		while (alive)
+		{
+
+			while (SDL_PollEvent(&event)) {
+				switch (event.type)
+				{
+				case SDL_QUIT:
 					alive = !alive;
-				}
-				if (event.motion.x <= replayRect.x + replayRect.w && event.motion.x >= replayRect.x  && event.motion.y <= replayRect.y + replayRect.h && event.motion.y >= replayRect.h) {
-					SDL_DestroyTexture(bgTexture);
-					SDL_DestroyTexture(gameOverText);
-					SDL_DestroyTexture(replayText);
-					SDL_DestroyTexture(exitText);
-					SDL_DestroyWindow(gameOver);
-					SDL_DestroyRenderer(renderer3);
-					playAgain = true;
-					char** maining = (char**)'a';
-					main(1, maining);
-					
-				}
+					break;
+				case SDL_MOUSEBUTTONDOWN:
+					if (event.motion.x <= exitRect.x + exitRect.w && event.motion.x >= exitRect.x  && event.motion.y <= exitRect.y + exitRect.h && event.motion.y >= exitRect.h) {
+						alive = !alive;
+					}
+					if (event.motion.x <= replayRect.x + replayRect.w && event.motion.x >= replayRect.x  && event.motion.y <= replayRect.y + replayRect.h && event.motion.y >= replayRect.h) {
+						SDL_DestroyTexture(bgTexture);
+						SDL_DestroyTexture(gameOverText);
+						SDL_DestroyTexture(replayText);
+						SDL_DestroyTexture(exitText);
+						SDL_DestroyWindow(gameOver);
+						SDL_DestroyRenderer(renderer3);
+						playAgain = true;
+						char** maining = (char**)'a';
+						main(1, maining);
 
+					}
+
+				}
+			}
+			SDL_RenderCopy(renderer3, bgTexture, nullptr, &bgRect);
+			SDL_RenderCopy(renderer3, replayText, nullptr, &replayRect);
+			SDL_RenderCopy(renderer3, gameOverText, nullptr, &gameOverRect);
+			for (int i = 0; i < 10; i++) {
+				SDL_RenderCopy(renderer3, mTexture[i], nullptr, &textRect[i]);
+			}
+			SDL_RenderCopy(renderer3, rankingTexture, nullptr, &rankingRect);
+			SDL_RenderCopy(renderer3, exitText, nullptr, &exitRect);
+			SDL_RenderPresent(renderer3);
+		}
+	}
+	if (iPlus == 2) {
+		TTF_Init();
+		cout << "Enter Your Name" << endl;
+		string name;
+		cin >> name;
+		//read & update ranking
+		list<PlayerData> ranking;
+		string textureText[10];
+		std::ifstream loadfile("RankingMedium.bin", std::ios::binary);
+		if (loadfile.good()) {
+			PlayerData playerData[10];
+			for (int i = 0; i < 10; i++) {
+				int aux = loadfile.tellg();
+				if (i != 0) aux += 1;
+				loadfile.seekg(aux);
+				std::getline(loadfile, playerData[i].name, '\0'); // Get player name (only if null ternimated in binary)
+				loadfile.read(reinterpret_cast<char*>(&playerData[i].score), sizeof(playerData[i].score)); // Read int bytes
+				if (playerData[i].name == "") playerData[i].score = 0;
+				else {
+					ranking.emplace_front(playerData[i]);
+				}
+			}
+			loadfile.close();
+		}
+		loadfile.close();
+		//acctualizar lista
+		PlayerData playerData = { name, score };
+
+		ranking.emplace_front(playerData);
+
+		ranking.sort(compFirst);
+		cout << "sorted List" << endl;
+		for (list<PlayerData>::iterator it = ranking.begin(); it != ranking.end(); ++it)
+		{
+			if (it->score > 0) {
+				cout << it->name << ":" << it->score << endl;
 			}
 		}
-		SDL_RenderCopy(renderer3, bgTexture, nullptr, &bgRect);
-		SDL_RenderCopy(renderer3, replayText, nullptr, &replayRect);
-		SDL_RenderCopy(renderer3, gameOverText, nullptr, &gameOverRect);
-		for (int i = 0; i < 10; i++) {
-			SDL_RenderCopy(renderer3, mTexture[i], nullptr, &textRect[i]);
+		std::ofstream savefile("RankingMedium.bin", std::ios::binary);
+		int i = 0;
+		if (savefile.good()) {
+			for (list<PlayerData>::iterator it = ranking.begin(); it != ranking.end(); ++it)
+			{
+				if (it->name != "" && score > 0 && i <= 10) {
+					savefile.write(it->name.c_str(), it->name.size()); // Write string to binary file
+					savefile.write("\0", sizeof(char));
+					savefile.write(reinterpret_cast<char*>(&it->score), sizeof(it->score));
+					savefile.write("\0", sizeof(char));// Write int to binary file
+				}
+				i++;
+			}
+			savefile.close();
 		}
-		SDL_RenderCopy(renderer3, rankingTexture, nullptr, &rankingRect);
-		SDL_RenderCopy(renderer3, exitText, nullptr, &exitRect);
-		SDL_RenderPresent(renderer3);
+
+
+		SDL_Window* gameOver = SDL_CreateWindow("GameOver", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+		SDL_Renderer* renderer3 = SDL_CreateRenderer(gameOver, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+		SDL_Color color = { 255,255,255 };
+		TTF_Font* gFont = TTF_OpenFont("../../res/fnt/Hyperspace.otf", 20);
+		SDL_Surface* textSurface[10];
+		SDL_Texture* mTexture[10];
+		SDL_Rect textRect[10];
+		int j = 0;
+
+		for (list<PlayerData>::iterator it = ranking.begin(); it != ranking.end(); ++it)
+		{
+			if (j < 10) {
+
+				textureText[j] = to_string(j + 1) + "  " + it->name.c_str() + "  " + to_string(it->score);
+				textSurface[j] = TTF_RenderText_Solid(gFont, textureText[j].c_str(), color);
+				mTexture[j] = SDL_CreateTextureFromSurface(renderer3, textSurface[j]);
+				if (j == 0)
+					textRect[j] = { 35,WIDTH / 2 - 75, textSurface[j]->w,textSurface[j]->h };
+				else {
+					textRect[j] = { 35  ,textRect[j - 1].y + textSurface[j]->h, textSurface[j]->w,textSurface[j]->h };
+				}
+			}
+			j++;
+		}
+
+		for (int i = 0; i < 10; i++) {
+			if (textureText[i] == "") {
+				textureText[i] = to_string(i + 1) + "  " + "      " + "  " + to_string(0);
+				textSurface[i] = TTF_RenderText_Solid(gFont, textureText[i].c_str(), color);
+				mTexture[i] = SDL_CreateTextureFromSurface(renderer3, textSurface[i]);
+				if (i == 0)
+					textRect[i] = { 35,WIDTH / 2 - 75, textSurface[i]->w,textSurface[i]->h };
+				else {
+					textRect[i] = { 35  ,textRect[i - 1].y + textSurface[i]->h, textSurface[i]->w,textSurface[i]->h };
+				}
+			}
+		}
+		ranking.clear();
+
+
+		SDL_Surface* rankingSurface = TTF_RenderText_Solid(gFont, "RANKING MEDIUM", color);
+		SDL_Texture* rankingTexture = SDL_CreateTextureFromSurface(renderer3, rankingSurface);
+		SDL_Rect rankingRect = { 40,WIDTH / 2 - 100,rankingSurface->w,rankingSurface->h };
+
+
+
+
+		SDL_Texture *bgTexture = IMG_LoadTexture(renderer3, "../../res/gfx/blacks.png");
+		SDL_Rect bgRect = { 0, 0, WIDTH, HEIGHT };
+
+		SDL_Texture *gameOverText = IMG_LoadTexture(renderer3, "../../res/gfx/gameover.png");
+		SDL_Rect gameOverRect = { (WIDTH / 2) - 200,50,400,200 };
+
+		SDL_Texture *replayText = IMG_LoadTexture(renderer3, "../../res/gfx/playagain.png");
+		SDL_Rect replayRect = { WIDTH / 2 - 75 , HEIGHT / 2 , 150, 100 };
+
+		SDL_Texture *exitText = IMG_LoadTexture(renderer3, "../../res/gfx/exit.png");
+		SDL_Rect exitRect = { WIDTH / 2 - 75 , HEIGHT / 2 + 150, 150, 100 };
+
+		if (bgTexture == nullptr) {
+			cout << "error";
+		}
+		SDL_Event event;
+		while (alive)
+		{
+
+			while (SDL_PollEvent(&event)) {
+				switch (event.type)
+				{
+				case SDL_QUIT:
+					alive = !alive;
+					break;
+				case SDL_MOUSEBUTTONDOWN:
+					if (event.motion.x <= exitRect.x + exitRect.w && event.motion.x >= exitRect.x  && event.motion.y <= exitRect.y + exitRect.h && event.motion.y >= exitRect.h) {
+						alive = !alive;
+					}
+					if (event.motion.x <= replayRect.x + replayRect.w && event.motion.x >= replayRect.x  && event.motion.y <= replayRect.y + replayRect.h && event.motion.y >= replayRect.h) {
+						SDL_DestroyTexture(bgTexture);
+						SDL_DestroyTexture(gameOverText);
+						SDL_DestroyTexture(replayText);
+						SDL_DestroyTexture(exitText);
+						SDL_DestroyWindow(gameOver);
+						SDL_DestroyRenderer(renderer3);
+						playAgain = true;
+						char** maining = (char**)'a';
+						main(1, maining);
+
+					}
+
+				}
+			}
+			SDL_RenderCopy(renderer3, bgTexture, nullptr, &bgRect);
+			SDL_RenderCopy(renderer3, replayText, nullptr, &replayRect);
+			SDL_RenderCopy(renderer3, gameOverText, nullptr, &gameOverRect);
+			for (int i = 0; i < 10; i++) {
+				SDL_RenderCopy(renderer3, mTexture[i], nullptr, &textRect[i]);
+			}
+			SDL_RenderCopy(renderer3, rankingTexture, nullptr, &rankingRect);
+			SDL_RenderCopy(renderer3, exitText, nullptr, &exitRect);
+			SDL_RenderPresent(renderer3);
+		}
+	}
+
+	if (iPlus == 3) {
+		TTF_Init();
+		cout << "Enter Your Name" << endl;
+		string name;
+		cin >> name;
+		//read & update ranking
+		list<PlayerData> ranking;
+		string textureText[10];
+		std::ifstream loadfile("RankingHard.bin", std::ios::binary);
+		if (loadfile.good()) {
+			PlayerData playerData[10];
+			for (int i = 0; i < 10; i++) {
+				int aux = loadfile.tellg();
+				if (i != 0) aux += 1;
+				loadfile.seekg(aux);
+				std::getline(loadfile, playerData[i].name, '\0'); // Get player name (only if null ternimated in binary)
+				loadfile.read(reinterpret_cast<char*>(&playerData[i].score), sizeof(playerData[i].score)); // Read int bytes
+				if (playerData[i].name == "") playerData[i].score = 0;
+				else {
+					ranking.emplace_front(playerData[i]);
+				}
+			}
+			loadfile.close();
+		}
+		loadfile.close();
+		//acctualizar lista
+		PlayerData playerData = { name, score };
+
+		ranking.emplace_front(playerData);
+
+		ranking.sort(compFirst);
+		cout << "sorted List" << endl;
+		for (list<PlayerData>::iterator it = ranking.begin(); it != ranking.end(); ++it)
+		{
+			if (it->score > 0) {
+				cout << it->name << ":" << it->score << endl;
+			}
+		}
+		std::ofstream savefile("RankingHard.bin", std::ios::binary);
+		int i = 0;
+		if (savefile.good()) {
+			for (list<PlayerData>::iterator it = ranking.begin(); it != ranking.end(); ++it)
+			{
+				if (it->name != "" && score > 0 && i <= 10) {
+					savefile.write(it->name.c_str(), it->name.size()); // Write string to binary file
+					savefile.write("\0", sizeof(char));
+					savefile.write(reinterpret_cast<char*>(&it->score), sizeof(it->score));
+					savefile.write("\0", sizeof(char));// Write int to binary file
+				}
+				i++;
+			}
+			savefile.close();
+		}
+
+
+		SDL_Window* gameOver = SDL_CreateWindow("GameOver", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+		SDL_Renderer* renderer3 = SDL_CreateRenderer(gameOver, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+		SDL_Color color = { 255,255,255 };
+		TTF_Font* gFont = TTF_OpenFont("../../res/fnt/Hyperspace.otf", 20);
+		SDL_Surface* textSurface[10];
+		SDL_Texture* mTexture[10];
+		SDL_Rect textRect[10];
+		int j = 0;
+
+		for (list<PlayerData>::iterator it = ranking.begin(); it != ranking.end(); ++it)
+		{
+			if (j < 10) {
+
+				textureText[j] = to_string(j + 1) + "  " + it->name.c_str() + "  " + to_string(it->score);
+				textSurface[j] = TTF_RenderText_Solid(gFont, textureText[j].c_str(), color);
+				mTexture[j] = SDL_CreateTextureFromSurface(renderer3, textSurface[j]);
+				if (j == 0)
+					textRect[j] = { 35,WIDTH / 2 - 75, textSurface[j]->w,textSurface[j]->h };
+				else {
+					textRect[j] = { 35  ,textRect[j - 1].y + textSurface[j]->h, textSurface[j]->w,textSurface[j]->h };
+				}
+			}
+			j++;
+		}
+
+		for (int i = 0; i < 10; i++) {
+			if (textureText[i] == "") {
+				textureText[i] = to_string(i + 1) + "  " + "      " + "  " + to_string(0);
+				textSurface[i] = TTF_RenderText_Solid(gFont, textureText[i].c_str(), color);
+				mTexture[i] = SDL_CreateTextureFromSurface(renderer3, textSurface[i]);
+				if (i == 0)
+					textRect[i] = { 35,WIDTH / 2 - 75, textSurface[i]->w,textSurface[i]->h };
+				else {
+					textRect[i] = { 35  ,textRect[i - 1].y + textSurface[i]->h, textSurface[i]->w,textSurface[i]->h };
+				}
+			}
+		}
+		ranking.clear();
+
+
+		SDL_Surface* rankingSurface = TTF_RenderText_Solid(gFont, "RANKING HARD", color);
+		SDL_Texture* rankingTexture = SDL_CreateTextureFromSurface(renderer3, rankingSurface);
+		SDL_Rect rankingRect = { 40,WIDTH / 2 - 100,rankingSurface->w,rankingSurface->h };
+
+
+
+
+		SDL_Texture *bgTexture = IMG_LoadTexture(renderer3, "../../res/gfx/blacks.png");
+		SDL_Rect bgRect = { 0, 0, WIDTH, HEIGHT };
+
+		SDL_Texture *gameOverText = IMG_LoadTexture(renderer3, "../../res/gfx/gameover.png");
+		SDL_Rect gameOverRect = { (WIDTH / 2) - 200,50,400,200 };
+
+		SDL_Texture *replayText = IMG_LoadTexture(renderer3, "../../res/gfx/playagain.png");
+		SDL_Rect replayRect = { WIDTH / 2 - 75 , HEIGHT / 2 , 150, 100 };
+
+		SDL_Texture *exitText = IMG_LoadTexture(renderer3, "../../res/gfx/exit.png");
+		SDL_Rect exitRect = { WIDTH / 2 - 75 , HEIGHT / 2 + 150, 150, 100 };
+
+		if (bgTexture == nullptr) {
+			cout << "error";
+		}
+		SDL_Event event;
+		while (alive)
+		{
+
+			while (SDL_PollEvent(&event)) {
+				switch (event.type)
+				{
+				case SDL_QUIT:
+					alive = !alive;
+					break;
+				case SDL_MOUSEBUTTONDOWN:
+					if (event.motion.x <= exitRect.x + exitRect.w && event.motion.x >= exitRect.x  && event.motion.y <= exitRect.y + exitRect.h && event.motion.y >= exitRect.h) {
+						alive = !alive;
+					}
+					if (event.motion.x <= replayRect.x + replayRect.w && event.motion.x >= replayRect.x  && event.motion.y <= replayRect.y + replayRect.h && event.motion.y >= replayRect.h) {
+						SDL_DestroyTexture(bgTexture);
+						SDL_DestroyTexture(gameOverText);
+						SDL_DestroyTexture(replayText);
+						SDL_DestroyTexture(exitText);
+						SDL_DestroyWindow(gameOver);
+						SDL_DestroyRenderer(renderer3);
+						playAgain = true;
+						char** maining = (char**)'a';
+						main(1, maining);
+
+					}
+
+				}
+			}
+			SDL_RenderCopy(renderer3, bgTexture, nullptr, &bgRect);
+			SDL_RenderCopy(renderer3, replayText, nullptr, &replayRect);
+			SDL_RenderCopy(renderer3, gameOverText, nullptr, &gameOverRect);
+			for (int i = 0; i < 10; i++) {
+				SDL_RenderCopy(renderer3, mTexture[i], nullptr, &textRect[i]);
+			}
+			SDL_RenderCopy(renderer3, rankingTexture, nullptr, &rankingRect);
+			SDL_RenderCopy(renderer3, exitText, nullptr, &exitRect);
+			SDL_RenderPresent(renderer3);
+		}
 	}
 
 }
@@ -514,59 +830,69 @@ void play() {
 					//bullet collision
 					for (int g = 0; g < bullets.size(); g++) {
 						if (!bigAs.empty() && bigAs.size() != 0 && h <  bigAs.size()) {
-						if (bullets[g].x >= bigAs[h].x && bullets[g].x <= bigAs[h].x + bigAs[h].w && bullets[g].y >= bigAs[h].y && bullets[g].y <= bigAs[h].y + bigAs[h].h) {
+							if ((bullets[g].x >= bigAs[h].x && bullets[g].x <= (bigAs[h].x + bigAs[h].w)) ||
+								((bullets[g].x + bullets[g].w) >= bigAs[h].x && (bullets[g].x + bullets[g].w) <= (bigAs[h].x + bigAs[h].w))) {
+								//Now we look at the y axis:
+								if ((bullets[g].y >= bigAs[h].y && bullets[g].y <= (bigAs[h].y + bigAs[h].h)) ||
+									((bullets[g].y + bullets[g].h) >= bigAs[h].y && (bullets[g].y + bullets[g].h) <= (bigAs[h].y + bigAs[h].h))) {
 
-							score += 20;
-							iSpeed += score / 10000000;
-							bullets.erase(bullets.begin() + g);
-							nomARect.x = bigAs[h].x;
-							nomARect.y = bigAs[h].y;
-							nomAs.push_back(nomARect);
-							nomAs.push_back(nomARect);
-							bigAs.erase(bigAs.begin() + h);
-
+									score += 20;
+									iSpeed += score / 10000000;
+									bullets.erase(bullets.begin() + g);
+									nomARect.x = bigAs[h].x;
+									nomARect.y = bigAs[h].y;
+									nomAs.push_back(nomARect);
+									nomAs.push_back(nomARect);
+									bigAs.erase(bigAs.begin() + h);
+								}
+							}
 						}
 					}
 				}
 			}
-		}
+		
 		if (!nomAs.empty() && !invul) {
 			for (int h = 0; h < nomAs.size(); h++) {
 				//srand(time(NULL));
 				//SDL_Rect target = { (rand() % WIDTH),(rand() % HEIGHT),0,0 };
 
 
-				if (nomAs[h].x >= shipRect.x && nomAs[h].x <= shipRect.x + shipRect.w && nomAs[h].y >= shipRect.y && nomAs[h].y <= shipRect.y + shipRect.h) {
-					//
-					shipRect.x = WIDTH / 2 - shipRect.w;
-					shipRect.y = HEIGHT / 2 - shipRect.h;
-					//cout << "xoc";
-					cors.pop_back();
-					iLives--;
-					invul = true;
-					SDL_TimerID timerID = SDL_AddTimer(1.5 * 1000, invulnerable, "1.5 seconds waited!");
+				if ((shipRect.x >= nomAs[h].x && shipRect.x <= (nomAs[h].x + nomAs[h].w)) ||
+					((shipRect.x + shipRect.w) >= nomAs[h].x && (shipRect.x + shipRect.w) <= (nomAs[h].x + nomAs[h].w))) {
+					//Now we look at the y axis:
+					if ((shipRect.y >= nomAs[h].y && shipRect.y <= (nomAs[h].y + nomAs[h].h)) ||
+						((shipRect.y + shipRect.h) >= nomAs[h].y && (shipRect.y + shipRect.h) <= (nomAs[h].y + nomAs[h].h))) {
+						//The sprites appear to overlap.
+						shipRect.x = WIDTH / 2 - shipRect.w;
+						shipRect.y = HEIGHT / 2 - shipRect.h;
+						cors.pop_back();
+						iLives--;
+						invul = true;
+						SDL_TimerID timerID = SDL_AddTimer(1.5 * 1000, invulnerable, "1.5 seconds waited!");
 
-
+					}
 				}
 
 				
 					//bullet collision
 					for (int g = 0; g < bullets.size(); g++) {
 						if (!nomAs.empty() && nomAs.size() != 0 && h < nomAs.size()) {
-						if (bullets[g].x >= nomAs[h].x && bullets[g].x <= nomAs[h].x + nomAs[h].w && bullets[g].y >= nomAs[h].y && bullets[g].y <= nomAs[h].y + nomAs[h].h) {
-							score += 50;
-							iSpeed += score / 10000000;
-							bullets.erase(bullets.begin() + g);
-							smlARect.x = nomAs[h].x;
-							smlARect.y = nomAs[h].y;
-							smlAs.push_back(smlARect);
-							smlAs.push_back(smlARect);
-							nomAs.erase(nomAs.begin() + h);
+							if ((bullets[g].x >= nomAs[h].x && bullets[g].x <= (nomAs[h].x + nomAs[h].w)) ||
+								((bullets[g].x + bullets[g].w) >= nomAs[h].x && (bullets[g].x + bullets[g].w) <= (nomAs[h].x + nomAs[h].w))) {
+								//Now we look at the y axis:
+								if ((bullets[g].y >= nomAs[h].y && bullets[g].y <= (nomAs[h].y + nomAs[h].h)) ||
+									((bullets[g].y + bullets[g].h) >= nomAs[h].y && (bullets[g].y + bullets[g].h) <= (nomAs[h].y + nomAs[h].h))) {
+									score += 50;
+									iSpeed += score / 10000000;
+									bullets.erase(bullets.begin() + g);
+									smlARect.x = nomAs[h].x;
+									smlARect.y = nomAs[h].y;
+									smlAs.push_back(smlARect);
+									smlAs.push_back(smlARect);
+									nomAs.erase(nomAs.begin() + h);
 
-						}
-
-
-
+								}
+							}
 					}
 				}
 			}
@@ -595,13 +921,18 @@ void play() {
 					//bullet collision
 					for (int g = 0; g < bullets.size(); g++) {
 						if (!smlAs.empty() && smlAs.size() != 0 && h < smlAs.size()) {
-						if (bullets[g].x >= smlAs[h].x && bullets[g].x <= smlAs[h].x + smlAs[h].w && bullets[g].y >= smlAs[h].y && bullets[g].y <= smlAs[h].y + smlAs[h].h) {
-							score += 100;
-							iSpeed += score / 10000000;
-							bullets.erase(bullets.begin() + g);
-							smlAs.erase(smlAs.begin() + h);
+							if ((bullets[g].x >= smlAs[h].x && bullets[g].x <= (smlAs[h].x + smlAs[h].w)) ||
+								((bullets[g].x + bullets[g].w) >= smlAs[h].x && (bullets[g].x + bullets[g].w) <= (smlAs[h].x + smlAs[h].w))) {
+								//Now we look at the y axis:
+								if ((bullets[g].y >= smlAs[h].y && bullets[g].y <= (smlAs[h].y + smlAs[h].h)) ||
+									((bullets[g].y + bullets[g].h) >= smlAs[h].y && (bullets[g].y + bullets[g].h) <= (smlAs[h].y + smlAs[h].h))) {
+									score += 100;
+									iSpeed += score / 10000000;
+									bullets.erase(bullets.begin() + g);
+									smlAs.erase(smlAs.begin() + h);
 
-						}
+								}
+							}
 					}
 				}
 			}
@@ -642,7 +973,10 @@ void play() {
 			int i = 0;
 			for (vector<SDL_Rect>::iterator it = cors.begin(); it != cors.end(); it++, i++)
 			{
-				SDL_RenderCopy(renderer2, vida, nullptr, &cors[i]);
+				if (i < cors.size()) {
+					SDL_RenderCopy(renderer2, vida, nullptr, &cors[i]);
+				}
+				
 			}
 		}
 		if (!bullets.empty()) {
@@ -650,6 +984,7 @@ void play() {
 			for (vector<SDL_Rect>::iterator it = bullets.begin(); it != bullets.end(); it++, b++)
 			{
 				SDL_RenderCopy(renderer2, bullet, nullptr, &bullets[b]);
+				
 			}
 		}
 		//SDL_RenderCopy(renderer2, bullet, nullptr, &bulletRect);
@@ -831,36 +1166,39 @@ int menu() {
 					}
 					else if (event.motion.x <= (WIDTH / 2) - 50 + 100 && event.motion.x >= (WIDTH / 2) - 50 && event.motion.y <= HEIGHT / 2 + 100 && event.motion.y >= HEIGHT / 2) {
 						cout << "Normal" << endl;
+						//lvlpas = false;
 						//cridar funcior play i mirar dificultat
 						if (xml_node<> *pNode = pRoot->first_node("normal"))
 						{
 							for (xml_node<> *pNodeI = pNode->first_node(); pNodeI; pNodeI = pNodeI = pNodeI->next_sibling())
 							{
 								if (pNodeI->name_size() == 5) {
-									cout << "vides -";
+									//cout << "vides -";
 									lives = pNodeI->value();
-									cout << lives << endl;
+									//cout << lives << endl;
 									std::string::size_type sz;
 									iLives = stoi(lives, &sz);
 								}
 								if (pNodeI->name_size() == 8) {
-									cout << "speed -";
+									//cout << "speed -";
 									speed = pNodeI->value();
-									cout << speed << endl;
+									//cout << speed << endl;
 									std::string::size_type sz;
 									iSpeed = stoi(speed, &sz);
 								}
 								if (pNodeI->name_size() == 7) {
-									cout << "enemies -";
+									//cout << "enemies -";
 									enemies = pNodeI->value();
-									cout << enemies << endl;
+									//cout << enemies << endl;
 									std::string::size_type sz;
-									//iEnemies = stoi(enemies, &sz);
+									iEnemies = stoi(enemies, &sz);
 								}
 								if (pNodeI->name_size() == 11) {
-									cout << "plus -";
+									//cout << "plus -";
 									pluse = pNodeI->value();
-									cout << pluse << endl;
+									//cout << pluse << endl;
+									std::string::size_type sz;
+									iPlus = stoi(pluse, &sz);
 								}
 								//cout << pNodeI->name() << ':' << pNodeI->value() << '\n';
 							}
@@ -883,30 +1221,32 @@ int menu() {
 							for (xml_node<> *pNodeI = pNode->first_node(); pNodeI; pNodeI = pNodeI = pNodeI->next_sibling())
 							{
 								if (pNodeI->name_size() == 5) {
-									cout << "vides -";
+									//cout << "vides -";
 									lives = pNodeI->value();
-									cout << lives << endl;
+									//cout << lives << endl;
 									std::string::size_type sz;
 									iLives = stoi(lives, &sz);
 								}
 								if (pNodeI->name_size() == 8) {
-									cout << "speed -";
+									//cout << "speed -";
 									speed = pNodeI->value();
-									cout << speed << endl;
+									// << speed << endl;
 									std::string::size_type sz;
 									iSpeed = stoi(speed, &sz);
 								}
 								if (pNodeI->name_size() == 7) {
-									cout << "enemies -";
+									//cout << "enemies -";
 									enemies = pNodeI->value();
-									cout << enemies << endl;
+									//cout << enemies << endl;
 									std::string::size_type sz;
 									iEnemies = stoi(enemies, &sz);
 								}
 								if (pNodeI->name_size() == 11) {
-									cout << "plus -";
+									//cout << "plus -";
 									pluse = pNodeI->value();
-									cout << pluse << endl;
+									//cout << pluse << endl;
+									std::string::size_type sz;
+									iPlus = stoi(pluse, &sz);
 								}
 								//cout << pNodeI->name() << ':' << pNodeI->value() << '\n';
 							}

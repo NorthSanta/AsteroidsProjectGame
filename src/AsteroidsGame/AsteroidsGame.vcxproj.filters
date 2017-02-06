@@ -26,5 +26,11 @@
     <None Include="Ranking.bin">
       <Filter>Archivos de recursos</Filter>
     </None>
+    <None Include="RankingMedium.bin">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="RankingHard.bin">
+      <Filter>Archivos de recursos</Filter>
+    </None>
   </ItemGroup>
 </Project>

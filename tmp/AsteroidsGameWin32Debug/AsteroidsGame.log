@@ -1,3 +1,41 @@
-﻿  AsteroidsGame.vcxproj -> C:\Users\Usuario\Documents\Visual Studio 2015\Projects\AsteroidsProject\\bin\Win32Debug\AsteroidsGame.exe
+﻿  Game.cpp
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(89): warning C4244: 'inicializando': conversión de 'std::streamoff' a 'int'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(246): warning C4244: 'inicializando': conversión de 'std::streamoff' a 'int'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(404): warning C4244: 'inicializando': conversión de 'std::streamoff' a 'int'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(558): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(724): warning C4244: '-=': conversión de 'double' a 'int'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(727): warning C4244: '+=': conversión de 'double' a 'int'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(730): warning C4244: '+=': conversión de 'double' a 'int'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(733): warning C4244: '-=': conversión de 'double' a 'int'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(755): warning C4018: '<': no coinciden signed/unsigned
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(757): warning C4244: '-=': conversión de 'double' a 'int'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(758): warning C4244: '-=': conversión de 'double' a 'int'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(772): warning C4018: '<': no coinciden signed/unsigned
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(776): warning C4244: '-=': conversión de 'float' a 'int'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(777): warning C4244: '-=': conversión de 'float' a 'int'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(786): warning C4018: '<': no coinciden signed/unsigned
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(789): warning C4244: '-=': conversión de 'float' a 'int'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(790): warning C4244: '-=': conversión de 'float' a 'int'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(799): warning C4018: '<': no coinciden signed/unsigned
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(802): warning C4244: '-=': conversión de 'float' a 'int'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(803): warning C4244: '-=': conversión de 'float' a 'int'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(812): warning C4018: '<': no coinciden signed/unsigned
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(826): warning C4244: 'argumento': conversión de 'double' a 'Uint32'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(831): warning C4018: '<': no coinciden signed/unsigned
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(832): warning C4018: '<': no coinciden signed/unsigned
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(855): warning C4018: '<': no coinciden signed/unsigned
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(871): warning C4244: 'argumento': conversión de 'double' a 'Uint32'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(878): warning C4018: '<': no coinciden signed/unsigned
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(879): warning C4018: '<': no coinciden signed/unsigned
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(902): warning C4018: '<': no coinciden signed/unsigned
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(915): warning C4244: 'argumento': conversión de 'double' a 'Uint32'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(922): warning C4018: '<': no coinciden signed/unsigned
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(923): warning C4018: '<': no coinciden signed/unsigned
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(976): warning C4018: '<': no coinciden signed/unsigned
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(584): warning C4101: 'delta': variable local sin referencia
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(1136): warning C4244: '=': conversión de 'int' a 'float'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(1187): warning C4244: '=': conversión de 'int' a 'float'; posible pérdida de datos
+c:\users\usuario\documents\visual studio 2015\projects\asteroidsproject\src\asteroidsgame\game.cpp(1235): warning C4244: '=': conversión de 'int' a 'float'; posible pérdida de datos
+  AsteroidsGame.vcxproj -> C:\Users\Usuario\Documents\Visual Studio 2015\Projects\AsteroidsProject\\bin\Win32Debug\AsteroidsGame.exe
   AsteroidsGame.vcxproj -> C:\Users\Usuario\Documents\Visual Studio 2015\Projects\AsteroidsProject\\bin\Win32Debug\AsteroidsGame.pdb (Full PDB)
   0 archivo(s) copiado(s)
